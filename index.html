@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Enter the Kingdom</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sky-deep:   #120B2E;
+    --sky-mid:    #241854;
+    --sky-violet: #4B3382;
+    --gold:       #F4C95D;
+    --gold-soft:  #FBE3A1;
+    --pink:       #FF7FB0;
+    --card-glass: rgba(255,255,255,0.06);
+    --card-border:rgba(244,201,93,0.35);
+    --text-main:  #F3EEFF;
+    --text-dim:   #B9AEDE;
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+
+  html,body{
+    height:100%;
+    font-family:'Quicksand', sans-serif;
+    background:var(--sky-deep);
+    color:var(--text-main);
+    overflow:hidden;
+  }
+
+  body{
+    position:relative;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    perspective:1400px;
+    background:
+      radial-gradient(ellipse at 50% 20%, var(--sky-violet) 0%, var(--sky-mid) 45%, var(--sky-deep) 100%);
+  }
+
+  /* ---------- Stars ---------- */
+  .stars{
+    position:absolute; inset:0;
+    overflow:hidden;
+    pointer-events:none;
+  }
+  .star{
+    position:absolute;
+    width:2px; height:2px;
+    background:var(--gold-soft);
+    border-radius:50%;
+    opacity:.7;
+    animation:twinkle var(--dur,3s) ease-in-out infinite;
+    animation-delay:var(--delay,0s);
+  }
+  @keyframes twinkle{
+    0%,100%{ opacity:.15; transform:scale(1); }
+    50%{ opacity:1; transform:scale(1.6); }
+  }
+
+  /* ---------- Moon ---------- */
+  .moon{
+    position:absolute;
+    top:8%; right:12%;
+    width:90px; height:90px;
+    border-radius:50%;
+    background:radial-gradient(circle at 35% 35%, #FFF9E6, var(--gold-soft) 60%, var(--gold) 100%);
+    box-shadow:0 0 60px 18px rgba(244,201,93,0.35);
+    animation:moonRise 1.8s ease-out;
+  }
+  @keyframes moonRise{
+    from{ transform:translateY(-40px); opacity:0; }
+    to{ transform:translateY(0); opacity:1; }
+  }
+
+  /* ---------- Castle silhouette ---------- */
+  .castle-wrap{
+    position:absolute;
+    bottom:0; left:0; right:0;
+    display:flex;
+    justify-content:center;
+    pointer-events:none;
+    transform:translateY(6%);
+    animation:castleRise 1.6s cubic-bezier(.2,.8,.2,1) .2s both;
+  }
+  @keyframes castleRise{
+    from{ transform:translateY(24%); opacity:0; }
+    to{ transform:translateY(6%); opacity:1; }
+  }
+  .castle-wrap svg{ width:min(1100px, 140vw); height:auto; display:block; }
+
+  .hill{
+    position:absolute;
+    bottom:0; left:0; right:0;
+    height:14vh;
+    background:linear-gradient(180deg, #0E0926, #05030F);
+    clip-path:polygon(0% 60%, 8% 45%, 20% 55%, 32% 35%, 48% 50%, 62% 30%, 78% 48%, 90% 38%, 100% 55%, 100% 100%, 0% 100%);
+  }
+
+  /* ---------- Fireflies / sparkles ---------- */
+  .sparkle{
+    position:absolute;
+    width:5px; height:5px;
+    border-radius:50%;
+    background:var(--gold);
+    box-shadow:0 0 8px 2px var(--gold-soft);
+    animation:float var(--dur,7s) ease-in-out infinite;
+    animation-delay:var(--delay,0s);
+    opacity:.85;
+  }
+  @keyframes float{
+    0%{ transform:translate(0,0); opacity:0; }
+    10%{ opacity:.9; }
+    50%{ transform:translate(var(--x,20px), -140px); }
+    90%{ opacity:.6; }
+    100%{ transform:translate(calc(var(--x,20px) * 1.6), -220px); opacity:0; }
+  }
+
+  /* ---------- Firework burst on load ---------- */
+  .burst{
+    position:absolute;
+    width:6px; height:6px;
+    border-radius:50%;
+    left:50%; top:50%;
+    background:var(--pink);
+    opacity:0;
+  }
+
+  /* ---------- Card scene / 3D tilt ---------- */
+  .scene{
+    position:relative;
+    z-index:5;
+    transform-style:preserve-3d;
+    animation:cardIn 1s cubic-bezier(.2,.9,.25,1) .5s both;
+  }
+  @keyframes cardIn{
+    from{ opacity:0; transform:translateY(30px) scale(.94); }
+    to{ opacity:1; transform:translateY(0) scale(1); }
+  }
+
+  .card{
+    width:min(380px, 88vw);
+    padding:44px 36px 36px;
+    border-radius:22px;
+    background:var(--card-glass);
+    border:1px solid var(--card-border);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+    box-shadow:
+      0 30px 60px -20px rgba(0,0,0,0.6),
+      0 0 0 1px rgba(255,255,255,0.02) inset,
+      0 0 40px -10px rgba(244,201,93,0.25);
+    transform-style:preserve-3d;
+    transition:transform .25s ease-out;
+    will-change:transform;
+  }
+
+  .crest{
+    width:56px; height:56px;
+    margin:0 auto 14px;
+    transform:translateZ(50px);
+  }
+
+  h1{
+    font-family:'Fredoka', sans-serif;
+    font-weight:600;
+    font-size:1.7rem;
+    text-align:center;
+    letter-spacing:.3px;
+    background:linear-gradient(180deg, var(--gold-soft), var(--gold));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    transform:translateZ(40px);
+  }
+
+  .sub{
+    text-align:center;
+    color:var(--text-dim);
+    font-size:.88rem;
+    margin-top:6px;
+    margin-bottom:28px;
+    transform:translateZ(30px);
+  }
+
+  form{ transform-style:preserve-3d; }
+
+  .field{
+    position:relative;
+    margin-bottom:20px;
+    transform:translateZ(25px);
+  }
+
+  .field input{
+    width:100%;
+    padding:14px 16px;
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.14);
+    border-radius:12px;
+    color:var(--text-main);
+    font-family:'Quicksand', sans-serif;
+    font-size:.95rem;
+    outline:none;
+    transition:border-color .25s, box-shadow .25s, background .25s;
+  }
+
+  .field input::placeholder{ color:var(--text-dim); }
+
+  .field input:focus{
+    border-color:var(--gold);
+    background:rgba(244,201,93,0.06);
+    box-shadow:0 0 0 3px rgba(244,201,93,0.15);
+  }
+
+  .row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:.78rem;
+    color:var(--text-dim);
+    margin-bottom:26px;
+    transform:translateZ(20px);
+  }
+
+  .row label{ display:flex; align-items:center; gap:6px; cursor:pointer; }
+  .row a{ color:var(--gold-soft); text-decoration:none; }
+  .row a:hover{ text-decoration:underline; }
+
+  button.enter{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:12px;
+    font-family:'Fredoka', sans-serif;
+    font-weight:600;
+    font-size:.98rem;
+    letter-spacing:.3px;
+    color:#241505;
+    background:linear-gradient(135deg, var(--gold-soft), var(--gold));
+    cursor:pointer;
+    position:relative;
+    overflow:hidden;
+    transform:translateZ(35px);
+    box-shadow:0 10px 25px -8px rgba(244,201,93,0.55);
+    transition:transform .2s ease, box-shadow .2s ease;
+  }
+
+  button.enter:hover{
+    transform:translateZ(45px) translateY(-2px);
+    box-shadow:0 14px 30px -8px rgba(244,201,93,0.7);
+  }
+
+  button.enter:active{ transform:translateZ(35px) translateY(0); }
+
+  button.enter .shine{
+    position:absolute;
+    top:0; left:-60%;
+    width:40%; height:100%;
+    background:linear-gradient(120deg, transparent, rgba(255,255,255,.7), transparent);
+    transform:skewX(-20deg);
+    animation:shine 3.2s ease-in-out infinite;
+  }
+  @keyframes shine{
+    0%{ left:-60%; }
+    45%{ left:130%; }
+    100%{ left:130%; }
+  }
+
+  .foot{
+    text-align:center;
+    margin-top:22px;
+    font-size:.82rem;
+    color:var(--text-dim);
+    transform:translateZ(20px);
+  }
+  .foot a{ color:var(--gold-soft); text-decoration:none; font-weight:600; }
+  .foot a:hover{ text-decoration:underline; }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation:none !important; transition:none !important; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="stars" id="stars"></div>
+  <div class="moon"></div>
+
+  <div id="sparkles"></div>
+
+  <div class="castle-wrap">
+    <svg viewBox="0 0 900 340" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="castleGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#2B2050"/>
+          <stop offset="100%" stop-color="#100B26"/>
+        </linearGradient>
+      </defs>
+      <!-- side towers -->
+      <rect x="60" y="200" width="46" height="120" fill="url(#castleGrad)"/>
+      <polygon points="60,200 83,160 106,200" fill="url(#castleGrad)"/>
+      <rect x="780" y="200" width="46" height="120" fill="url(#castleGrad)"/>
+      <polygon points="780,200 803,160 826,200" fill="url(#castleGrad)"/>
+
+      <!-- mid towers -->
+      <rect x="170" y="150" width="54" height="170" fill="url(#castleGrad)"/>
+      <polygon points="170,150 197,102 224,150" fill="url(#castleGrad)"/>
+      <rect x="660" y="150" width="54" height="170" fill="url(#castleGrad)"/>
+      <polygon points="660,150 687,102 714,150" fill="url(#castleGrad)"/>
+
+      <!-- main keep -->
+      <rect x="330" y="120" width="240" height="200" fill="url(#castleGrad)"/>
+      <!-- crenellations -->
+      <rect x="330" y="112" width="20" height="16" fill="url(#castleGrad)"/>
+      <rect x="366" y="112" width="20" height="16" fill="url(#castleGrad)"/>
+      <rect x="402" y="112" width="20" height="16" fill="url(#castleGrad)"/>
+      <rect x="514" y="112" width="20" height="16" fill="url(#castleGrad)"/>
+      <rect x="550" y="112" width="20" height="16" fill="url(#castleGrad)"/>
+
+      <!-- central spire -->
+      <rect x="420" y="40" width="60" height="100" fill="url(#castleGrad)"/>
+      <polygon points="420,40 450,-24 480,40" fill="url(#castleGrad)"/>
+      <line x1="450" y1="-24" x2="450" y2="-46" stroke="#F4C95D" stroke-width="2"/>
+      <polygon points="450,-46 450,-34 462,-40" fill="#F4C95D"/>
+
+      <!-- tower roofs -->
+      <polygon points="197,102 175,150 219,150" fill="#3A2A63"/>
+      <polygon points="687,102 665,150 709,150" fill="#3A2A63"/>
+
+      <!-- windows -->
+      <g fill="#F4C95D" opacity="0.85">
+        <rect x="440" y="180" width="10" height="16" rx="5"/>
+        <rect x="470" y="180" width="10" height="16" rx="5"/>
+        <rect x="440" y="230" width="10" height="16" rx="5"/>
+        <rect x="470" y="230" width="10" height="16" rx="5"/>
+        <rect x="192" y="190" width="8" height="14" rx="4"/>
+        <rect x="682" y="190" width="8" height="14" rx="4"/>
+        <rect x="76" y="230" width="7" height="12" rx="3.5"/>
+        <rect x="796" y="230" width="7" height="12" rx="3.5"/>
+      </g>
+    </svg>
+  </div>
+  <div class="hill"></div>
+
+  <div class="scene">
+    <div class="card" id="card">
+      <svg class="crest" viewBox="0 0 60 60" fill="none">
+        <circle cx="30" cy="30" r="27" stroke="#F4C95D" stroke-width="2" opacity="0.6"/>
+        <path d="M30 12 L34 26 L48 26 L37 34 L41 48 L30 39 L19 48 L23 34 L12 26 L26 26 Z"
+              fill="#F4C95D"/>
+      </svg>
+
+      <h1>Welcome to the Kingdom</h1>
+      <p class="sub">Sign in to continue your story</p>
+
+      <form id="loginForm">
+        <div class="field">
+          <input type="email" placeholder="Your email" required />
+        </div>
+        <div class="field">
+          <input type="password" placeholder="Your secret word" required />
+        </div>
+
+        <div class="row">
+          <label><input type="checkbox" style="accent-color:#F4C95D;"> Remember me</label>
+          <a href="#">Forgot the way?</a>
+        </div>
+
+        <button type="submit" class="enter">
+          <span class="shine"></span>
+          Enter the Kingdom
+        </button>
+      </form>
+
+      <p class="foot">New here? <a href="#">Begin your story</a></p>
+    </div>
+  </div>
+
+<script>
+  // ---- generate stars ----
+  const starField = document.getElementById('stars');
+  const STAR_COUNT = 90;
+  for(let i=0;i<STAR_COUNT;i++){
+    const s = document.createElement('div');
+    s.className = 'star';
+    s.style.left = Math.random()*100 + '%';
+    s.style.top = Math.random()*70 + '%';
+    s.style.setProperty('--dur', (2 + Math.random()*3).toFixed(2)+'s');
+    s.style.setProperty('--delay', (Math.random()*4).toFixed(2)+'s');
+    starField.appendChild(s);
+  }
+
+  // ---- generate floating sparkles ----
+  const sparkleField = document.getElementById('sparkles');
+  const SPARK_COUNT = 18;
+  for(let i=0;i<SPARK_COUNT;i++){
+    const sp = document.createElement('div');
+    sp.className = 'sparkle';
+    sp.style.left = (10 + Math.random()*80) + '%';
+    sp.style.bottom = '6vh';
+    sp.style.setProperty('--dur', (5 + Math.random()*4).toFixed(2)+'s');
+    sp.style.setProperty('--delay', (Math.random()*6).toFixed(2)+'s');
+    sp.style.setProperty('--x', (Math.random()*60 - 30)+'px');
+    sparkleField.appendChild(sp);
+  }
+
+  // ---- one-time firework burst on load ----
+  window.addEventListener('load', () => {
+    const colors = ['#F4C95D', '#FF7FB0', '#B9AEDE', '#FBE3A1'];
+    for(let burst=0; burst<3; burst++){
+      setTimeout(() => {
+        const originX = 20 + Math.random()*60;
+        const originY = 15 + Math.random()*20;
+        const particles = 22;
+        for(let i=0;i<particles;i++){
+          const p = document.createElement('div');
+          p.className = 'burst';
+          const angle = (Math.PI*2/particles) * i;
+          const dist = 60 + Math.random()*50;
+          p.style.left = originX + 'vw';
+          p.style.top = originY + 'vh';
+          p.style.background = colors[Math.floor(Math.random()*colors.length)];
+          document.body.appendChild(p);
+          const dx = Math.cos(angle)*dist;
+          const dy = Math.sin(angle)*dist;
+          p.animate([
+            { transform:'translate(0,0)', opacity:1 },
+            { transform:`translate(${dx}px, ${dy}px)`, opacity:0 }
+          ], { duration: 900 + Math.random()*400, easing:'cubic-bezier(.2,.7,.3,1)' });
+          setTimeout(()=>p.remove(), 1400);
+        }
+      }, burst*450);
+    }
+  });
+
+  // ---- 3D tilt on card, following mouse ----
+  const card = document.getElementById('card');
+  const scene = card.parentElement;
+
+  function handleTilt(e){
+    const rect = card.getBoundingClientRect();
+    const cx = rect.left + rect.width/2;
+    const cy = rect.top + rect.height/2;
+    const dx = (e.clientX - cx) / (rect.width/2);
+    const dy = (e.clientY - cy) / (rect.height/2);
+    const maxTilt = 10;
+    card.style.transform = `rotateY(${dx*maxTilt}deg) rotateX(${-dy*maxTilt}deg)`;
+  }
+
+  function resetTilt(){
+    card.style.transform = 'rotateY(0deg) rotateX(0deg)';
+  }
+
+  window.addEventListener('mousemove', handleTilt);
+  window.addEventListener('mouseleave', resetTilt);
+
+  // touch fallback: gentle tilt based on touch position
+  window.addEventListener('touchmove', (e) => {
+    if(e.touches[0]) handleTilt(e.touches[0]);
+  }, { passive:true });
+  window.addEventListener('touchend', resetTilt);
+
+  // ---- form submit (demo only) ----
+  document.getElementById('loginForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    const btn = this.querySelector('.enter');
+    btn.textContent = '✨ Opening the gates...';
+    setTimeout(() => {
+      btn.innerHTML = '<span class="shine"></span>Enter the Kingdom';
+    }, 1800);
+  });
+</script>
+</body>
+</html>
