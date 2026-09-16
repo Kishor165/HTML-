@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shinobi Portal | Naruto Shippuden Login</title>
+    <!-- Google Fonts for Anime Theme -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Orbitron:wght@600;900&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --chakra-blue: #00f0ff;
+            --kyuubi-orange: #ff5500;
+            --sharingan-red: #ff003b;
+            --dark-bg: rgba(10, 10, 15, 0.75);
+            --border-glow: #ff5500;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #050508;
+        }
+
+        /* Video Background */
+        .video-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+        }
+
+        #bg-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.6) contrast(1.2);
+        }
+
+        /* Overlay Particle Canvas */
+        #particle-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Main Wrapper */
+        .wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            perspective: 1000px;
+        }
+
+        /* Login Card */
+        .login-card {
+            position: relative;
+            width: 420px;
+            padding: 40px 30px;
+            background: var(--dark-bg);
+            border-radius: 16px;
+            box-shadow: 0 0 25px rgba(255, 85, 0, 0.35), inset 0 0 15px rgba(0, 240, 255, 0.2);
+            backdrop-filter: blur(14px);
+            border: 2px solid var(--kyuubi-orange);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .login-card:hover {
+            box-shadow: 0 0 45px rgba(255, 85, 0, 0.65), inset 0 0 25px rgba(0, 240, 255, 0.45);
+        }
+
+        /* Animated Konoha Symbol Header */
+        .card-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .konoha-symbol {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 10px;
+            background: radial-gradient(circle, var(--kyuubi-orange), transparent 70%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse-chakra 2s infinite alternate;
+        }
+
+        .konoha-symbol svg {
+            width: 45px;
+            fill: #fff;
+            filter: drop-shadow(0 0 8px var(--chakra-blue));
+        }
+
+        .card-header h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            color: #fff;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px var(--kyuubi-orange);
+        }
+
+        .card-header p {
+            font-size: 12px;
+            color: #aaa;
+            letter-spacing: 1px;
+        }
+
+        /* Input Fields */
+        .input-box {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .input-box input {
+            width: 100%;
+            padding: 14px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            outline: none;
+            color: #fff;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        .input-box label {
+            position: absolute;
+            top: 50%;
+            left: 15px;
+            transform: translateY(-50%);
+            color: #888;
+            pointer-events: none;
+            transition: 0.3s;
+            font-size: 14px;
+        }
+
+        .input-box input:focus ~ label,
+        .input-box input:valid ~ label {
+            top: -10px;
+            left: 10px;
+            font-size: 11px;
+            color: var(--chakra-blue);
+            background: #050508;
+            padding: 0 5px;
+            border-radius: 3px;
+        }
+
+        .input-box input:focus {
+            border-color: var(--chakra-blue);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+        }
+
+        /* Sharingan Eye Toggle */
+        .sharingan-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+            border-radius: 50%;
+            background: #222;
+            border: 2px solid var(--sharingan-red);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.5s ease;
+        }
+
+        .sharingan-toggle::after {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: #000;
+            border-radius: 50%;
+        }
+
+        .sharingan-toggle.active {
+            transform: translateY(-50%) rotate(360deg);
+            background: var(--sharingan-red);
+            box-shadow: 0 0 10px var(--sharingan-red);
+        }
+
+        /* Action Controls */
+        .options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            font-size: 12px;
+            color: #bbb;
+        }
+
+        .options label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        .options a {
+            color: var(--chakra-blue);
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .options a:hover {
+            color: var(--kyuubi-orange);
+            text-shadow: 0 0 5px var(--kyuubi-orange);
+        }
+
+        /* Shinobi Submit Button */
+        .btn-submit {
+            position: relative;
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(45deg, var(--kyuubi-orange), #ff0055);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            overflow: hidden;
+            letter-spacing: 2px;
+            box-shadow: 0 0 15px rgba(255, 85, 0, 0.4);
+            transition: 0.4s ease;
+        }
+
+        .btn-submit:hover {
+            background: linear-gradient(45deg, #ff0055, var(--chakra-blue));
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.7);
+            letter-spacing: 3px;
+        }
+
+        /* Footer Element */
+        .footer-text {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #777;
+        }
+
+        .footer-text a {
+            color: #fff;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        /* Keyframe Animations */
+        @keyframes pulse-chakra {
+            0% { box-shadow: 0 0 15px var(--kyuubi-orange); }
+            100% { box-shadow: 0 0 35px var(--chakra-blue), 0 0 15px var(--kyuubi-orange); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Dynamic Background Video with Pixabay Link -->
+    <div class="video-container">
+        <video autoplay loop muted playsinline id="bg-video">
+            <source src="https://pixabay.com/videos/download/video-128646_medium.mp4" type="video/mp4">
+            Your browser does not support HTML5 video.
+        </video>
+    </div>
+
+    <!-- Particle Overlay (Chakra Ember Effect) -->
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- Main Login Interface -->
+    <div class="wrapper">
+        <div class="login-card" id="card">
+            <div class="card-header">
+                <div class="konoha-symbol">
+                    <!-- Leaf Village Emblem SVG -->
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 18,12A6,6 0 0,0 12,6Z"/>
+                    </svg>
+                </div>
+                <h2>Shinobi World</h2>
+                <p>Enter your Ninja Credentials</p>
+            </div>
+
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="input-box">
+                    <input type="text" id="shinobi-id" required autocomplete="off">
+                    <label>Ninja ID / Scroll Name</label>
+                </div>
+
+                <div class="input-box">
+                    <input type="password" id="password" required>
+                    <label>Secret Jutsu (Password)</label>
+                    <div class="sharingan-toggle" id="sharingan" onclick="togglePassword()" title="Activate Sharingan (Toggle Password)"></div>
+                </div>
+
+                <div class="options">
+                    <label>
+                        <input type="checkbox"> Remember Scroll
+                    </label>
+                    <a href="#">Forgot Jutsu?</a>
+                </div>
+
+                <button type="submit" class="btn-submit">ENTER WAY OF SHINOBI</button>
+            </form>
+
+            <div class="footer-text">
+                Not registered in the Scroll? <a href="#">Join Konoha</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Password Visibility Toggle with Sharingan Animation
+        function togglePassword() {
+            const pwdInput = document.getElementById('password');
+            const sharingan = document.getElementById('sharingan');
+            
+            if (pwdInput.type === 'password') {
+                pwdInput.type = 'text';
+                sharingan.classList.add('active');
+            } else {
+                pwdInput.type = 'password';
+                sharingan.classList.remove('active');
+            }
+        }
+
+        // Card 3D Tilt Effect on Mouse Move
+        const card = document.getElementById('card');
+        document.addEventListener('mousemove', (e) => {
+            const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
+            const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
+            card.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+        });
+
+        // Chakra Particles Canvas Animation
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        const particles = [];
+        class ChakraParticle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height + Math.random() * 100;
+                this.size = Math.random() * 3 + 1;
+                this.speedY = Math.random() * 2 + 0.5;
+                this.speedX = (Math.random() - 0.5) * 1.5;
+                this.color = Math.random() > 0.5 ? '#ff5500' : '#00f0ff';
+                this.opacity = Math.random() * 0.8 + 0.2;
+            }
+
+            update() {
+                this.y -= this.speedY;
+                this.x += this.speedX;
+                if (this.opacity > 0.01) this.opacity -= 0.003;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function initParticles() {
+            setInterval(() => {
+                if (particles.length < 120) {
+                    particles.push(new ChakraParticle());
+                }
+            }, 100);
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+                if (particles[i].opacity <= 0.01 || particles[i].y < 0) {
+                    particles.splice(i, 1);
+                    i--;
+                }
+            }
+            requestAnimationFrame(animateParticles);
+        }
+
+        initParticles();
+        animateParticles();
+
+        // Form Submit Action
+        function handleLogin(event) {
+            event.preventDefault();
+            const card = document.getElementById('card');
+            card.style.boxShadow = "0 0 60px #00f0ff, 0 0 30px #ff5500";
+            alert("Jutsu Authorized! Welcome to the Hidden Leaf Village.");
+        }
+    </script>
+</body>
+</html>
